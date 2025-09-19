@@ -1,4 +1,20 @@
 import React, { useState, useEffect } from 'react';
+  const [isFavorite, setIsFavorite] = useState(false);
+  // Check if current quote is in favorites
+  useEffect(() => {
+    if (!quote) return;
+    const favs = JSON.parse(localStorage.getItem('anime-favorites') || '[]');
+    setIsFavorite(favs.some(q => q.quote === quote.quote && q.character === quote.character && q.anime === quote.anime));
+  }, [quote]);
+  const addToFavorites = () => {
+    if (!quote) return;
+    const favs = JSON.parse(localStorage.getItem('anime-favorites') || '[]');
+    if (!favs.some(q => q.quote === quote.quote && q.character === quote.character && q.anime === quote.anime)) {
+      favs.push(quote);
+      localStorage.setItem('anime-favorites', JSON.stringify(favs));
+      setIsFavorite(true);
+    }
+  };
 import { motion, AnimatePresence } from 'framer-motion';
 
 function QuoteCard() {
@@ -29,11 +45,19 @@ function QuoteCard() {
       if (!response.ok) throw new Error('Failed to fetch quote');
       const result = await response.json();
       const data = result.data;
-      setQuote({
+      const newQuote = {
         quote: data.content,
         character: data.character.name,
         anime: data.anime.name
-      });
+      };
+      setQuote(newQuote);
+      // Add to recent quotes
+      let recent = JSON.parse(localStorage.getItem('anime-recent') || '[]');
+      // Avoid duplicates and keep max 20
+      recent = recent.filter(q => !(q.quote === newQuote.quote && q.character === newQuote.character && q.anime === newQuote.anime));
+      recent.unshift(newQuote);
+      if (recent.length > 20) recent = recent.slice(0, 20);
+      localStorage.setItem('anime-recent', JSON.stringify(recent));
       setCooldown(true);
       setTimeout(() => setCooldown(false), 3000);
     } catch (err) {
@@ -102,7 +126,7 @@ function QuoteCard() {
                 Error: {error}. Showing fallback quote.
               </p>
             )}
-            <div className="flex gap-4 mt-6">
+            <div className="flex gap-4 mt-6 flex-wrap">
               <button
                 onClick={fetchQuote}
                 className={`px-4 py-2 bg-neon-purple text-white rounded shadow-md hover:bg-purple-700 hover:shadow-lg hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-neon-purple ${cooldown ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -124,6 +148,14 @@ function QuoteCard() {
                 aria-label="Share quote to X"
               >
                 Share to X
+              </button>
+              <button
+                onClick={addToFavorites}
+                className={`px-4 py-2 bg-pink-600 text-white rounded shadow-md hover:bg-pink-700 hover:shadow-lg hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-pink-400 ${isFavorite ? 'opacity-50 cursor-not-allowed' : ''}`}
+                aria-label="Add to favorites"
+                disabled={isFavorite}
+              >
+                {isFavorite ? 'Favorited' : '❤ Favorite'}
               </button>
             </div>
           </motion.div>

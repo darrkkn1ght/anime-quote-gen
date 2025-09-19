@@ -4,6 +4,8 @@ import QuoteOfTheDay from './components/QuoteOfTheDay';
 import SearchQuotes from './components/SearchQuotes';
 import FunFacts from './components/FunFacts';
 import Favorites from './components/Favorites';
+import RecentQuotes from './components/RecentQuotes';
+import AnimeRecommendations from './components/AnimeRecommendations';
 
 function App() {
   return (
@@ -33,7 +35,7 @@ function App() {
         {/* Recent Quotes Section */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold text-neon-blue mb-4">Recent Quotes</h2>
-          <div className="bg-gray-800 rounded-lg p-4 text-gray-200">(Coming soon)</div>
+          <RecentQuotes />
         </section>
 
         {/* Fun Facts Section */}
@@ -45,7 +47,7 @@ function App() {
         {/* Anime Recommendations Section */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold text-neon-blue mb-4">Anime Recommendations</h2>
-          <div className="bg-gray-800 rounded-lg p-4 text-gray-200">(Coming soon)</div>
+          <AnimeRecommendations />
         </section>
 
         {/* Main Quote Card Section */}
