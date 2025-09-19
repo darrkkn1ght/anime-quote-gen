@@ -15,9 +15,9 @@ export default function SearchQuotes() {
     setResults([]);
     let url = '';
     if (type === 'anime') {
-      url = `https://api.animechan.io/v1/quotes/anime?title=${encodeURIComponent(query)}`;
+      url = `https://api.animechan.io/v1/quotes?anime=${encodeURIComponent(query)}`;
     } else {
-      url = `https://api.animechan.io/v1/quotes/character?name=${encodeURIComponent(query)}`;
+      url = `https://api.animechan.io/v1/quotes?character=${encodeURIComponent(query)}`;
     }
     try {
       const res = await fetch(url);

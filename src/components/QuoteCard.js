@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+function QuoteCard() {
+  const [quote, setQuote] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [cooldown, setCooldown] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+
+  const fallbackQuote = {
+    quote: "Even if we forget the faces of our friends, we will never forget the bonds that were carved into our souls.",
+    character: "Otonashi Yuzuru",
+    anime: "Angel Beats!"
+  };
+
   // Check if current quote is in favorites
   useEffect(() => {
     if (!quote) return;
     const favs = JSON.parse(localStorage.getItem('anime-favorites') || '[]');
     setIsFavorite(favs.some(q => q.quote === quote.quote && q.character === quote.character && q.anime === quote.anime));
   }, [quote]);
+
   const addToFavorites = () => {
     if (!quote) return;
     const favs = JSON.parse(localStorage.getItem('anime-favorites') || '[]');
@@ -15,19 +30,7 @@ import React, { useState, useEffect } from 'react';
       setIsFavorite(true);
     }
   };
-import { motion, AnimatePresence } from 'framer-motion';
 
-function QuoteCard() {
-  const [quote, setQuote] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [cooldown, setCooldown] = useState(false);
-
-  const fallbackQuote = {
-    quote: "Even if we forget the faces of our friends, we will never forget the bonds that were carved into our souls.",
-    character: "Otonashi Yuzuru",
-    anime: "Angel Beats!"
-  };
 
   const fetchQuote = async () => {
     if (cooldown) return;
