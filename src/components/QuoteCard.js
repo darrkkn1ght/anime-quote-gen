@@ -16,10 +16,16 @@ function QuoteCard() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('https://animechan.xyz/api/random');
+      const response = await fetch('https://api.animechan.io/v1/quotes/random');
       if (!response.ok) throw new Error('Failed to fetch quote');
-      const data = await response.json();
-      setQuote(data);
+      const result = await response.json();
+      // result: { status: 'success', data: { content, anime: { name }, character: { name } } }
+      const data = result.data;
+      setQuote({
+        quote: data.content,
+        character: data.character.name,
+        anime: data.anime.name
+      });
     } catch (err) {
       setError(err.message);
       setQuote(fallbackQuote);
