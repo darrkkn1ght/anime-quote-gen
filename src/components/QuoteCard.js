@@ -5,6 +5,7 @@ function QuoteCard() {
   const [quote, setQuote] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cooldown, setCooldown] = useState(false);
 
   const fallbackQuote = {
     quote: "Even if we forget the faces of our friends, we will never forget the bonds that were carved into our souls.",
@@ -13,19 +14,28 @@ function QuoteCard() {
   };
 
   const fetchQuote = async () => {
+    if (cooldown) return;
     setLoading(true);
     setError(null);
     try {
       const response = await fetch('https://api.animechan.io/v1/quotes/random');
+      if (response.status === 429) {
+        setError('You are requesting quotes too quickly. Please wait a few seconds.');
+        setQuote(fallbackQuote);
+        setCooldown(true);
+        setTimeout(() => setCooldown(false), 5000);
+        return;
+      }
       if (!response.ok) throw new Error('Failed to fetch quote');
       const result = await response.json();
-      // result: { status: 'success', data: { content, anime: { name }, character: { name } } }
       const data = result.data;
       setQuote({
         quote: data.content,
         character: data.character.name,
         anime: data.anime.name
       });
+      setCooldown(true);
+      setTimeout(() => setCooldown(false), 3000);
     } catch (err) {
       setError(err.message);
       setQuote(fallbackQuote);
@@ -95,10 +105,11 @@ function QuoteCard() {
             <div className="flex gap-4 mt-6">
               <button
                 onClick={fetchQuote}
-                className="px-4 py-2 bg-neon-purple text-white rounded shadow-md hover:bg-purple-700 hover:shadow-lg hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-neon-purple"
+                className={`px-4 py-2 bg-neon-purple text-white rounded shadow-md hover:bg-purple-700 hover:shadow-lg hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-neon-purple ${cooldown ? 'opacity-50 cursor-not-allowed' : ''}`}
                 aria-label="Fetch new quote"
+                disabled={cooldown}
               >
-                New Quote
+                {cooldown ? 'Please wait...' : 'New Quote'}
               </button>
               <button
                 onClick={copyToClipboard}
